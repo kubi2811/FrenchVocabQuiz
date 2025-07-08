@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mon Vocabulaire Français</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col items-center p-4">
+  <div class="max-w-xl w-full bg-white shadow-xl rounded-2xl p-6">
+    <h1 class="text-2xl font-bold mb-4 text-center">📘 Mon Vocabulaire Français</h1>
+    
+    <div class="flex mb-4">
+      <input id="vocabInput" type="text" placeholder="Entrez un mot en français..." class="flex-grow px-4 py-2 border rounded-l-xl focus:outline-none">
+      <button onclick="addWord()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-xl">Ajouter</button>
+    </div>
+
+    <ul id="vocabList" class="space-y-2">
+      <!-- Les mots ajoutés apparaîtront ici -->
+    </ul>
+
+    <button onclick="clearAll()" class="mt-6 text-sm text-red-500 hover:underline">Effacer tout</button>
+  </div>
+
+  <script>
+    const input = document.getElementById('vocabInput');
+    const list = document.getElementById('vocabList');
+
+    function getVocab() {
+      return JSON.parse(localStorage.getItem('vocabList') || '[]');
+    }
+
+    function setVocab(vocab) {
+      localStorage.setItem('vocabList', JSON.stringify(vocab));
+    }
+
+    function renderList() {
+      list.innerHTML = '';
+      const vocab = getVocab();
+      vocab.forEach((word, index) => {
+        const li = document.createElement('li');
+        li.className = 'flex justify-between items-center bg-gray-50 px-4 py-2 rounded-xl shadow';
+        li.innerHTML = `
+          <span>${word}</span>
+          <button onclick="removeWord(${index})" class="text-red-500">✕</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function addWord() {
+      const word = input.value.trim();
+      if (!word) return;
+      const vocab = getVocab();
+      vocab.push(word);
+      setVocab(vocab);
+      input.value = '';
+      renderList();
+    }
+
+    function removeWord(index) {
+      const vocab = getVocab();
+      vocab.splice(index, 1);
+      setVocab(vocab);
+      renderList();
+    }
+
+    function clearAll() {
+      if (confirm('Voulez-vous vraiment tout effacer ?')) {
+        localStorage.removeItem('vocabList');
+        renderList();
+      }
+    }
+
+    // Initialisation
+    renderList();
+  </script>
+</body>
+</html>
