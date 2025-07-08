@@ -4,39 +4,414 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>French Vocabulary AI Tutor</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: var(--white);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            min-height: calc(100vh - 4rem);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .home-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        section {
+            background-color: var(--white);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        section:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .level-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        button {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .level-options button {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .level-options button:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .level-options button i {
+            margin-right: 8px;
+        }
+
+        #question-text {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .options button {
+            background-color: var(--light);
+            color: var(--dark);
+            text-align: left;
+            padding: 1rem 1.5rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .options button:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        #next-btn {
+            margin: 1.5rem auto 0;
+            background-color: var(--success);
+            color: white;
+            padding: 0.8rem 2rem;
+            display: block;
+            box-shadow: 0 4px 10px rgba(76, 201, 240, 0.3);
+        }
+
+        #next-btn:hover {
+            background-color: #3aa8d8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(76, 201, 240, 0.4);
+        }
+
+        #feedback {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .correct {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .incorrect {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-card p {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-buttons button {
+            padding: 0.8rem 1.5rem;
+        }
+
+        #back-to-quiz {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        #reset-progress {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        #stats-btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        #stats-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(67, 97, 238, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
+        .retry-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            transition: all 0.3s;
+        }
+
+        .retry-btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 0;
+            }
+
+            h1 {
+                font-size: 2rem;
+                padding-top: 1rem;
+            }
+
+            section {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
+            <button class="home-btn" id="home-btn">
+                <i class="fas fa-home"></i>
+            </button>
             <h1>French Vocabulary AI Tutor</h1>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
             </div>
-            <p>Words learned: <span id="words-learned">0</span>/<span id="words-total">0</span></p>
+            <div class="progress-text">
+                <span id="words-learned">0</span>
+                <span>Words Learned</span>
+                <span id="words-total">0</span>
+            </div>
         </header>
 
         <main>
             <section id="level-selection" class="active">
                 <h2>Select Your Level</h2>
                 <div class="level-options">
-                    <button data-level="A1">A1 (Beginner)</button>
-                    <button data-level="A2">A2 (Elementary)</button>
-                    <button data-level="B1">B1 (Intermediate)</button>
-                    <button data-level="B2">B2 (Upper Intermediate)</button>
-                    <button data-level="C1">C1 (Advanced)</button>
+                    <button data-level="A1"><i class="fas fa-star"></i> A1 Beginner</button>
+                    <button data-level="A2"><i class="fas fa-star-half-alt"></i> A2 Elementary</button>
+                    <button data-level="B1"><i class="fas fa-star"></i> B1 Intermediate</button>
+                    <button data-level="B2"><i class="fas fa-star-half-alt"></i> B2 Upper Intermediate</button>
+                    <button data-level="C1"><i class="fas fa-star"></i> C1 Advanced</button>
                 </div>
             </section>
 
             <section id="quiz-section" class="hidden">
                 <h2 id="question-text"></h2>
                 <div id="options-container" class="options"></div>
-                <button id="next-btn" class="hidden">Next Question</button>
+                <button id="next-btn" class="hidden">Next Question <i class="fas fa-arrow-right"></i></button>
                 <div id="feedback" class="hidden"></div>
             </section>
 
             <section id="stats-section" class="hidden">
-                <h2>Your Progress</h2>
+                <h2>Your Learning Progress</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h3>New Words</h3>
@@ -51,16 +426,446 @@
                         <p id="very-learned-count">0</p>
                     </div>
                 </div>
-                <button id="back-to-quiz">Back to Quiz</button>
-                <button id="reset-progress">Reset Progress</button>
+                <div class="action-buttons">
+                    <button id="back-to-quiz"><i class="fas fa-arrow-left"></i> Back to Quiz</button>
+                    <button id="reset-progress"><i class="fas fa-redo"></i> Reset Progress</button>
+                </div>
             </section>
         </main>
 
         <footer>
-            <button id="stats-btn">View Progress</button>
+            <button id="stats-btn"><i class="fas fa-chart-line"></i> View Progress</button>
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // API Key for Gemini
+        const API_KEY = "AIzaSyBak_yItNOeNChN-JVUJlrGCofQCKhgtV0";
+
+        // DOM Elements
+        const levelSelection = document.getElementById('level-selection');
+        const quizSection = document.getElementById('quiz-section');
+        const statsSection = document.getElementById('stats-section');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackDiv = document.getElementById('feedback');
+        const statsBtn = document.getElementById('stats-btn');
+        const backToQuizBtn = document.getElementById('back-to-quiz');
+        const resetProgressBtn = document.getElementById('reset-progress');
+        const progressBar = document.getElementById('progress');
+        const wordsLearnedSpan = document.getElementById('words-learned');
+        const wordsTotalSpan = document.getElementById('words-total');
+        const newWordsCount = document.getElementById('new-words-count');
+        const justLearnedCount = document.getElementById('just-learned-count');
+        const veryLearnedCount = document.getElementById('very-learned-count');
+        const homeBtn = document.getElementById('home-btn');
+
+        // App State
+        let currentLevel = '';
+        let currentQuestion = null;
+        let userVocabulary = {
+            new: [],
+            justLearned: [],
+            veryLearned: []
+        };
+        let score = 0;
+        let questionsAnswered = 0;
+        let questionBank = [];
+        let currentQuestionIndex = 0;
+        let loading = false;
+
+        // Initialize the app
+        function init() {
+            loadUserData();
+            updateStatsDisplay();
+            
+            document.querySelectorAll('.level-options button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentLevel = btn.dataset.level;
+                    questionBank = [];
+                    currentQuestionIndex = 0;
+                    startQuiz();
+                });
+            });
+            
+            nextBtn.addEventListener('click', nextQuestion);
+            statsBtn.addEventListener('click', showStats);
+            backToQuizBtn.addEventListener('click', showQuiz);
+            resetProgressBtn.addEventListener('click', resetProgress);
+            homeBtn.addEventListener('click', goHome);
+        }
+
+        // Load user data from local storage
+        function loadUserData() {
+            const savedData = localStorage.getItem('frenchVocabData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                userVocabulary = data.userVocabulary || {
+                    new: [],
+                    justLearned: [],
+                    veryLearned: []
+                };
+                score = data.score || 0;
+                questionsAnswered = data.questionsAnswered || 0;
+                currentLevel = data.currentLevel || '';
+                questionBank = data.questionBank || [];
+                currentQuestionIndex = data.currentQuestionIndex || 0;
+            }
+        }
+
+        // Save user data to local storage
+        function saveUserData() {
+            const data = {
+                userVocabulary,
+                score,
+                questionsAnswered,
+                currentLevel,
+                questionBank,
+                currentQuestionIndex
+            };
+            localStorage.setItem('frenchVocabData', JSON.stringify(data));
+        }
+
+        // Go to home page
+        function goHome() {
+            levelSelection.classList.remove('hidden');
+            quizSection.classList.add('hidden');
+            statsSection.classList.add('hidden');
+            questionBank = [];
+            currentQuestionIndex = 0;
+            saveUserData();
+        }
+
+        // Start the quiz
+        function startQuiz() {
+            levelSelection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            statsSection.classList.add('hidden');
+            
+            if (questionBank.length === 0 || currentQuestionIndex >= questionBank.length) {
+                generateQuestionBatch();
+            } else {
+                showNextQuestion();
+            }
+        }
+
+        // Generate a batch of 5 questions with loading state
+        async function generateQuestionBatch() {
+            if (loading) return;
+            loading = true;
+            
+            // Show loading state
+            questionText.textContent = "";
+            optionsContainer.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Generating questions...</div>
+                </div>
+            `;
+            nextBtn.classList.add('hidden');
+            feedbackDiv.classList.add('hidden');
+
+            try {
+                // Generate 5 new questions
+                const newQuestions = [];
+                for (let i = 0; i < 5; i++) {
+                    const question = await generateSingleQuestion();
+                    newQuestions.push(question);
+                }
+                
+                questionBank = questionBank.concat(newQuestions);
+                saveUserData();
+                showNextQuestion();
+            } catch (error) {
+                console.error("Error generating questions:", error);
+                questionText.textContent = "Error generating questions. Please try again.";
+                optionsContainer.innerHTML = '<button onclick="generateQuestionBatch()" class="retry-btn">Retry</button>';
+            } finally {
+                loading = false;
+            }
+        }
+
+        // Generate a single question with optimized API call
+        async function generateSingleQuestion() {
+            let wordPool = Math.random() < 0.8 ? 'new' : 'justLearned';
+            if (userVocabulary[wordPool].length === 0) {
+                wordPool = wordPool === 'new' ? 'justLearned' : 'new';
+            }
+            
+            if (userVocabulary.new.length === 0 && userVocabulary.justLearned.length === 0) {
+                wordPool = 'new';
+            }
+
+            if (wordPool === 'new') {
+                return await generateNewWordQuestion();
+            } else {
+                return await generateReviewQuestion();
+            }
+        }
+
+        // Generate a question with a new word (optimized prompt)
+        async function generateNewWordQuestion() {
+            const prompt = `Provide a French vocabulary word at DELF ${currentLevel} level in this exact JSON format:
+{
+    "french": "word",
+    "english": "translation",
+    "incorrect": ["wrong1", "wrong2", "wrong3"]
+}
+No explanations, just the JSON.`;
+
+            const questionData = await callGeminiAPI(prompt);
+            
+            if (!questionData.french || !questionData.english || !questionData.incorrect || questionData.incorrect.length !== 3) {
+                throw new Error("Invalid question data received");
+            }
+            
+            const question = {
+                french: questionData.french,
+                english: questionData.english,
+                options: shuffleArray([questionData.english, ...questionData.incorrect]),
+                status: 'new'
+            };
+            
+            if (!userVocabulary.new.some(w => w.french === question.french)) {
+                userVocabulary.new.push({
+                    french: question.french,
+                    english: question.english
+                });
+            }
+            
+            return question;
+        }
+
+        // Generate a review question (optimized prompt)
+        async function generateReviewQuestion() {
+            const randomIndex = Math.floor(Math.random() * userVocabulary.justLearned.length);
+            const word = userVocabulary.justLearned[randomIndex];
+            
+            const prompt = `Provide 3 incorrect English translations for "${word.french}" (meaning "${word.english}") in this exact JSON format:
+{
+    "incorrect": ["wrong1", "wrong2", "wrong3"]
+}
+No explanations, just the JSON.`;
+
+            const questionData = await callGeminiAPI(prompt);
+            
+            if (!questionData.incorrect || questionData.incorrect.length !== 3) {
+                throw new Error("Invalid options data received");
+            }
+            
+            return {
+                french: word.french,
+                english: word.english,
+                options: shuffleArray([word.english, ...questionData.incorrect]),
+                status: 'justLearned'
+            };
+        }
+
+        // Optimized API call with timeout
+        async function callGeminiAPI(prompt) {
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+            
+            // Add timeout to the fetch request
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topP: 1,
+                            maxOutputTokens: 200 // Limit response size
+                        }
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!textResponse) {
+                    throw new Error("No text in API response");
+                }
+                
+                try {
+                    const cleanResponse = textResponse.replace(/```json|```/g, '').trim();
+                    return JSON.parse(cleanResponse);
+                } catch (parseError) {
+                    console.error("Failed to parse response:", textResponse);
+                    throw new Error("Invalid JSON response from API");
+                }
+            } catch (error) {
+                clearTimeout(timeoutId);
+                throw error;
+            }
+        }
+
+        // [Rest of the functions remain the same as in the previous version]
+        // showNextQuestion()
+        // displayQuestion()
+        // selectAnswer()
+        // nextQuestion()
+        // showStats()
+        // showQuiz()
+        // updateStatsDisplay()
+        // resetProgress()
+        // shuffleArray()
+        
+        // Show the next question from the bank
+        function showNextQuestion() {
+            if (currentQuestionIndex < questionBank.length) {
+                currentQuestion = questionBank[currentQuestionIndex];
+                displayQuestion();
+            } else {
+                generateQuestionBatch();
+            }
+        }
+
+        // Display the current question
+        function displayQuestion() {
+            questionText.textContent = `What does "${currentQuestion.french}" mean in English?`;
+            optionsContainer.innerHTML = '';
+            
+            currentQuestion.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.textContent = option;
+                btn.dataset.option = index;
+                btn.addEventListener('click', selectAnswer);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // Handle answer selection
+        function selectAnswer(e) {
+            const selectedOption = e.target.textContent;
+            const isCorrect = selectedOption === currentQuestion.english;
+            
+            document.querySelectorAll('#options-container button').forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === currentQuestion.english) {
+                    btn.style.backgroundColor = '#2ecc71';
+                    btn.style.color = 'white';
+                } else if (btn === e.target && !isCorrect) {
+                    btn.style.backgroundColor = '#e74c3c';
+                    btn.style.color = 'white';
+                }
+            });
+            
+            feedbackDiv.textContent = isCorrect ? 'Correct!' : `Incorrect. The correct answer is "${currentQuestion.english}".`;
+            feedbackDiv.className = isCorrect ? 'correct' : 'incorrect';
+            feedbackDiv.classList.remove('hidden');
+            
+            questionsAnswered++;
+            if (isCorrect) {
+                score++;
+                
+                if (currentQuestion.status === 'new') {
+                    const wordIndex = userVocabulary.new.findIndex(w => w.french === currentQuestion.french);
+                    if (wordIndex !== -1) {
+                        const word = userVocabulary.new.splice(wordIndex, 1)[0];
+                        userVocabulary.justLearned.push(word);
+                    }
+                } else if (currentQuestion.status === 'justLearned') {
+                    const wordIndex = userVocabulary.justLearned.findIndex(w => w.french === currentQuestion.french);
+                    if (wordIndex !== -1) {
+                        const word = userVocabulary.justLearned.splice(wordIndex, 1)[0];
+                        userVocabulary.veryLearned.push(word);
+                    }
+                }
+            }
+            
+            nextBtn.classList.remove('hidden');
+            saveUserData();
+            updateStatsDisplay();
+        }
+
+        // Move to the next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+            saveUserData();
+            
+            if (currentQuestionIndex < questionBank.length) {
+                showNextQuestion();
+            } else {
+                generateQuestionBatch();
+            }
+        }
+
+        // Show statistics
+        function showStats() {
+            quizSection.classList.add('hidden');
+            statsSection.classList.remove('hidden');
+            updateStatsDisplay();
+        }
+
+        // Show quiz
+        function showQuiz() {
+            statsSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+        }
+
+        // Update statistics display
+        function updateStatsDisplay() {
+            const totalWords = userVocabulary.new.length + userVocabulary.justLearned.length + userVocabulary.veryLearned.length;
+            const learnedWords = userVocabulary.justLearned.length + userVocabulary.veryLearned.length;
+            const progressPercentage = totalWords > 0 ? (learnedWords / totalWords) * 100 : 0;
+            
+            progressBar.style.width = `${progressPercentage}%`;
+            wordsLearnedSpan.textContent = learnedWords;
+            wordsTotalSpan.textContent = totalWords;
+            
+            newWordsCount.textContent = userVocabulary.new.length;
+            justLearnedCount.textContent = userVocabulary.justLearned.length;
+            veryLearnedCount.textContent = userVocabulary.veryLearned.length;
+        }
+
+        // Reset progress
+        function resetProgress() {
+            if (confirm("Are you sure you want to reset all your progress?")) {
+                userVocabulary = {
+                    new: [],
+                    justLearned: [],
+                    veryLearned: []
+                };
+                score = 0;
+                questionsAnswered = 0;
+                questionBank = [];
+                currentQuestionIndex = 0;
+                saveUserData();
+                updateStatsDisplay();
+                startQuiz();
+            }
+        }
+
+        // Helper function to shuffle array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Initialize the app when the page loads
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
