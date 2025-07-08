@@ -29,6 +29,8 @@ let userVocabulary = {
 };
 let score = 0;
 let questionsAnswered = 0;
+let questionBank = []; // Stores the generated questions
+let currentQuestionIndex = 0;
 
 // Initialize the app
 function init() {
@@ -38,6 +40,8 @@ function init() {
     document.querySelectorAll('.level-options button').forEach(btn => {
         btn.addEventListener('click', () => {
             currentLevel = btn.dataset.level;
+            questionBank = []; // Reset question bank when level changes
+            currentQuestionIndex = 0;
             startQuiz();
         });
     });
@@ -70,7 +74,9 @@ function saveUserData() {
         userVocabulary,
         score,
         questionsAnswered,
-        currentLevel
+        currentLevel,
+        questionBank,
+        currentQuestionIndex
     };
     localStorage.setItem('frenchVocabData', JSON.stringify(data));
 }
@@ -80,39 +86,54 @@ function startQuiz() {
     levelSelection.classList.add('hidden');
     quizSection.classList.remove('hidden');
     statsSection.classList.add('hidden');
-    generateQuestion();
+    
+    if (questionBank.length === 0 || currentQuestionIndex >= questionBank.length) {
+        generateQuestionBatch();
+    } else {
+        showNextQuestion();
+    }
 }
 
-// Generate a new question
-async function generateQuestion() {
-    questionText.textContent = "Generating question...";
+// Generate a batch of 5 questions
+async function generateQuestionBatch() {
+    questionText.textContent = "Generating questions...";
     optionsContainer.innerHTML = '';
     nextBtn.classList.add('hidden');
     feedbackDiv.classList.add('hidden');
 
     try {
-        let wordPool = Math.random() < 0.8 ? 'new' : 'justLearned';
-        if (userVocabulary[wordPool].length === 0) {
-            wordPool = wordPool === 'new' ? 'justLearned' : 'new';
+        // Generate 5 new questions
+        const newQuestions = [];
+        for (let i = 0; i < 5; i++) {
+            const question = await generateSingleQuestion();
+            newQuestions.push(question);
         }
         
-        if (userVocabulary.new.length === 0 && userVocabulary.justLearned.length === 0) {
-            wordPool = 'new';
-        }
-
-        if (wordPool === 'new') {
-            await generateNewWordQuestion();
-        } else {
-            await generateReviewQuestion();
-        }
-        
-        displayQuestion();
+        questionBank = questionBank.concat(newQuestions);
         saveUserData();
-        updateStatsDisplay();
+        showNextQuestion();
     } catch (error) {
-        console.error("Error generating question:", error);
-        questionText.textContent = "Error generating question. Please try again.";
-        optionsContainer.innerHTML = '<button onclick="generateQuestion()" class="retry-btn">Retry</button>';
+        console.error("Error generating questions:", error);
+        questionText.textContent = "Error generating questions. Please try again.";
+        optionsContainer.innerHTML = '<button onclick="generateQuestionBatch()" class="retry-btn">Retry</button>';
+    }
+}
+
+// Generate a single question
+async function generateSingleQuestion() {
+    let wordPool = Math.random() < 0.8 ? 'new' : 'justLearned';
+    if (userVocabulary[wordPool].length === 0) {
+        wordPool = wordPool === 'new' ? 'justLearned' : 'new';
+    }
+    
+    if (userVocabulary.new.length === 0 && userVocabulary.justLearned.length === 0) {
+        wordPool = 'new';
+    }
+
+    if (wordPool === 'new') {
+        return await generateNewWordQuestion();
+    } else {
+        return await generateReviewQuestion();
     }
 }
 
@@ -136,19 +157,21 @@ Return ONLY a JSON object in this format:
         throw new Error("Invalid question data received");
     }
     
-    currentQuestion = {
+    const question = {
         french: questionData.french,
         english: questionData.english,
         options: shuffleArray([questionData.english, ...questionData.incorrect]),
         status: 'new'
     };
     
-    if (!userVocabulary.new.some(w => w.french === currentQuestion.french)) {
+    if (!userVocabulary.new.some(w => w.french === question.french)) {
         userVocabulary.new.push({
-            french: currentQuestion.french,
-            english: currentQuestion.english
+            french: question.french,
+            english: question.english
         });
     }
+    
+    return question;
 }
 
 // Generate a review question
@@ -170,7 +193,7 @@ Return ONLY a JSON object in this format:
         throw new Error("Invalid options data received");
     }
     
-    currentQuestion = {
+    return {
         french: word.french,
         english: word.english,
         options: shuffleArray([word.english, ...questionData.incorrect]),
@@ -178,10 +201,20 @@ Return ONLY a JSON object in this format:
     };
 }
 
-// Call Gemini API - Updated endpoint
+// Show the next question from the bank
+function showNextQuestion() {
+    if (currentQuestionIndex < questionBank.length) {
+        currentQuestion = questionBank[currentQuestionIndex];
+        displayQuestion();
+    } else {
+        // If we've used all questions, generate a new batch
+        generateQuestionBatch();
+    }
+}
+
+// Call Gemini API
 async function callGeminiAPI(prompt) {
-    // Updated API endpoint
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${API_KEY}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
     
     const response = await fetch(API_URL, {
         method: 'POST',
@@ -219,7 +252,9 @@ async function callGeminiAPI(prompt) {
         console.error("Failed to parse response:", textResponse);
         throw new Error("Invalid JSON response from API");
     }
-}// Display the current question
+}
+
+// Display the current question
 function displayQuestion() {
     questionText.textContent = `What does "${currentQuestion.french}" mean in English?`;
     optionsContainer.innerHTML = '';
@@ -279,7 +314,15 @@ function selectAnswer(e) {
 
 // Move to the next question
 function nextQuestion() {
-    generateQuestion();
+    currentQuestionIndex++;
+    saveUserData();
+    
+    if (currentQuestionIndex < questionBank.length) {
+        showNextQuestion();
+    } else {
+        // If we've used all questions, generate a new batch
+        generateQuestionBatch();
+    }
 }
 
 // Show statistics
@@ -320,6 +363,8 @@ function resetProgress() {
         };
         score = 0;
         questionsAnswered = 0;
+        questionBank = [];
+        currentQuestionIndex = 0;
         saveUserData();
         updateStatsDisplay();
         startQuiz();
