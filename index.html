@@ -1,79 +1,66 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mon Vocabulaire Français</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Vocabulary AI Tutor</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-100 font-sans min-h-screen flex flex-col items-center p-4">
-  <div class="max-w-xl w-full bg-white shadow-xl rounded-2xl p-6">
-    <h1 class="text-2xl font-bold mb-4 text-center">📘 Mon Vocabulaire Français</h1>
-    
-    <div class="flex mb-4">
-      <input id="vocabInput" type="text" placeholder="Entrez un mot en français..." class="flex-grow px-4 py-2 border rounded-l-xl focus:outline-none">
-      <button onclick="addWord()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-xl">Ajouter</button>
+<body>
+    <div class="container">
+        <header>
+            <h1>French Vocabulary AI Tutor</h1>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <p>Words learned: <span id="words-learned">0</span>/<span id="words-total">0</span></p>
+        </header>
+
+        <main>
+            <section id="level-selection" class="active">
+                <h2>Select Your Level</h2>
+                <div class="level-options">
+                    <button data-level="A1">A1 (Beginner)</button>
+                    <button data-level="A2">A2 (Elementary)</button>
+                    <button data-level="B1">B1 (Intermediate)</button>
+                    <button data-level="B2">B2 (Upper Intermediate)</button>
+                    <button data-level="C1">C1 (Advanced)</button>
+                </div>
+            </section>
+
+            <section id="quiz-section" class="hidden">
+                <h2 id="question-text"></h2>
+                <div id="options-container" class="options"></div>
+                <button id="next-btn" class="hidden">Next Question</button>
+                <div id="feedback" class="hidden"></div>
+            </section>
+
+            <section id="stats-section" class="hidden">
+                <h2>Your Progress</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>New Words</h3>
+                        <p id="new-words-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Just Learned</h3>
+                        <p id="just-learned-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Very Learned</h3>
+                        <p id="very-learned-count">0</p>
+                    </div>
+                </div>
+                <button id="back-to-quiz">Back to Quiz</button>
+                <button id="reset-progress">Reset Progress</button>
+            </section>
+        </main>
+
+        <footer>
+            <button id="stats-btn">View Progress</button>
+        </footer>
     </div>
 
-    <ul id="vocabList" class="space-y-2">
-      <!-- Les mots ajoutés apparaîtront ici -->
-    </ul>
-
-    <button onclick="clearAll()" class="mt-6 text-sm text-red-500 hover:underline">Effacer tout</button>
-  </div>
-
-  <script>
-    const input = document.getElementById('vocabInput');
-    const list = document.getElementById('vocabList');
-
-    function getVocab() {
-      return JSON.parse(localStorage.getItem('vocabList') || '[]');
-    }
-
-    function setVocab(vocab) {
-      localStorage.setItem('vocabList', JSON.stringify(vocab));
-    }
-
-    function renderList() {
-      list.innerHTML = '';
-      const vocab = getVocab();
-      vocab.forEach((word, index) => {
-        const li = document.createElement('li');
-        li.className = 'flex justify-between items-center bg-gray-50 px-4 py-2 rounded-xl shadow';
-        li.innerHTML = `
-          <span>${word}</span>
-          <button onclick="removeWord(${index})" class="text-red-500">✕</button>
-        `;
-        list.appendChild(li);
-      });
-    }
-
-    function addWord() {
-      const word = input.value.trim();
-      if (!word) return;
-      const vocab = getVocab();
-      vocab.push(word);
-      setVocab(vocab);
-      input.value = '';
-      renderList();
-    }
-
-    function removeWord(index) {
-      const vocab = getVocab();
-      vocab.splice(index, 1);
-      setVocab(vocab);
-      renderList();
-    }
-
-    function clearAll() {
-      if (confirm('Voulez-vous vraiment tout effacer ?')) {
-        localStorage.removeItem('vocabList');
-        renderList();
-      }
-    }
-
-    // Initialisation
-    renderList();
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>
